@@ -3,6 +3,8 @@
 __pycache__/
 venv/
 env/
+/venv/
+/env/
 dist/
 build/
 *.egg-info/
@@ -21,3 +23,7 @@ build/
 
 # Miscellaneous
 .DS_Store
+
+# Database files
+db.sqlite3
+*.sqlite3
