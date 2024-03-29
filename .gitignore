@@ -27,3 +27,4 @@ build/
 # Database files
 db.sqlite3
 *.sqlite3
+*.db

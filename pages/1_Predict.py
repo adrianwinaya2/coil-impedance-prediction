@@ -7,40 +7,28 @@ import shap
 import pickle
 import sqlite3
 
-# conn = sqlite3.connect('database.db')
-# cursor = conn.cursor()
-conn = st.connection('history_db', type='sql')
-with open('xgb_fs.pkl', 'rb') as file:
-    model = pickle.load(file)
+import xgboost as xgb
 
 def insert_data(params, impedance):
-    with conn.session as s:
-        s.execute('''
-            INSERT INTO coil_impedance (
+    with st.connection('history_db', type='sql').session as s:
+        s.execute(f'''
+            INSERT INTO history (
                 pid_lv, lid_lv, tid_lv, pod_lv, lod_lv, tod_lv,
                 pid_hv, lid_hv, tid_hv, pod_hv, lod_hv, tod_hv, impedance
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            params['PID LV'], params['LID LV'], params['TID LV'],
-            params['POD LV'], params['LOD LV'], params['TOD LV'],
-            params['PID HV'], params['LID HV'], params['TID HV'],
-            params['POD HV'], params['LOD HV'], params['TOD HV'],
-            impedance
-        ))
+            VALUES (
+                {params['PID LV'][0]}, {params['LID LV'][0]}, {params['TID LV'][0]}, 
+                {params['POD LV'][0]}, {params['LOD LV'][0]}, {params['TOD LV'][0]},
+                {params['PID HV'][0]}, {params['LID HV'][0]}, {params['TID HV'][0]},
+                {params['POD HV'][0]}, {params['LOD HV'][0]}, {params['TOD HV'][0]}, {impedance}
+            )
+        ''')
         s.commit()
 
-def get_data():
-    return conn.query('select * from pet_owners')
-
-def close_connection():
-    conn.close()
-
 def predict(test_data):
-    # TODO
     # model = pd.read_pickle('coil_impedance_model.pkl')
-    
-    impedance = model.predict(test_data)[0]
+    impedance = model.predict(test_data[model.feature_names_in_])[0]
+
     st.write(f'The predicted impedance is {impedance:.2f} ohms')
     insert_data(test_data, impedance)
 
@@ -49,7 +37,7 @@ def predict(test_data):
     if visualize_button:
         visualize()
 
-    return impedance[0]
+    return impedance
 
 def visualize(model, test_data):
 
@@ -69,7 +57,7 @@ def visualize(model, test_data):
     
     return shap_values, explanation
 
-def shap_plot(shap_val, feature_data, explainer=None, explanation=None, index1=None, index2=None, show=True):
+def shap_plot(shap_val, feature_data, explainer=None, explanation=None, show=True):
     
     summary, decision, dependence, force, bar, embed, waterfall = st.tabs(['Summary', 'Decision', 'Dependence', 'Force', 'Bar', 'Embedding', 'Waterfall'])
 
@@ -85,7 +73,10 @@ def shap_plot(shap_val, feature_data, explainer=None, explanation=None, index1=N
     
     with dependence:
         st.header('Dependence Plot')
-        shap.dependence_plot(index1, interaction_index=index2, shap_values=shap_val, features=feature_data)
+        feature1 = st.selectbox('Feature 1', options=feature_data.columns, key='feature1')
+        feature2 = st.selectbox('Feature 2', options=feature_data.columns, key='feature2')
+
+        shap.dependence_plot(feature1, interaction_index=feature2, shap_values=shap_val, features=feature_data)
         st.pyplot(plt.gcf())
     
     with force:
@@ -95,12 +86,14 @@ def shap_plot(shap_val, feature_data, explainer=None, explanation=None, index1=N
 
     with bar:
         st.header('Bar Plot')
-        shap.bar_plot(shap_val, feature_data.values[index1], feature_data.columns)
+        feature1 = st.selectbox('Select Feature', options=feature_data.columns)
+        shap.bar_plot(shap_val, feature_data.values[feature1], feature_data.columns)
         st.pyplot(plt.gcf())
     
     with embed:
         st.header('Embedding Plot')
-        shap.embedding_plot(index1, shap_val.values, feature_data.columns)
+        feature1 = st.selectbox('Select Feature', options=feature_data.columns)
+        shap.embedding_plot(feature1, shap_val.values, feature_data.columns)
         st.pyplot(plt.gcf())
     
     with waterfall:
@@ -109,25 +102,30 @@ def shap_plot(shap_val, feature_data, explainer=None, explanation=None, index1=N
         st.pyplot(plt.gcf())
 
 
+# conn = sqlite3.connect('database.db')
+# cursor = conn.cursor()
+with open('models/xgb_fs.pkl', 'rb') as file:
+    model = pickle.load(file)
+
 st.title('Coil Impedance Prediction')
 with st.form(key='input_form'):
     left, right = st.columns(2)
     params = {
-        'pid_lv': left.number_input('PID LV'),
-        'lid_lv': left.number_input('LID LV'),
-        'tid_lv': left.number_input('TID LV'),
+        'PID LV': int(left.number_input('PID LV', format='%.0f')),
+        'LID LV': int(left.number_input('LID LV', format='%.0f')),
+        'TID LV': int(left.number_input('TID LV', format='%.0f')),
 
-        'pod_lv': left.number_input('POD LV'),
-        'lod_lv': left.number_input('LOD LV'),
-        'tod_lv': left.number_input('TOD LV'),
+        'POD LV': int(left.number_input('POD LV', format='%.0f')),
+        'LOD LV': int(left.number_input('LOD LV', format='%.0f')),
+        'TOD LV': int(left.number_input('TOD LV', format='%.0f')),
 
-        'pid_hv': right.number_input('PID HV'),
-        'lid_hv': right.number_input('LID HV'),
-        'tid_hv': right.number_input('TID HV'),
+        'PID HV': int(right.number_input('PID HV', format='%.0f')),
+        'LID HV': int(right.number_input('LID HV', format='%.0f')),
+        'TID HV': int(right.number_input('TID HV', format='%.0f')),
 
-        'pod_hv': right.number_input('POD HV'),
-        'lod_hv': right.number_input('LOD HV'),
-        'tod_hv': right.number_input('TOD HV'),
+        'POD HV': int(right.number_input('POD HV', format='%.0f')),
+        'LOD HV': int(right.number_input('LOD HV', format='%.0f')),
+        'TOD HV': int(right.number_input('TOD HV', format='%.0f')),
     }
 
     submitted = st.form_submit_button(label='Predict Impedance')
@@ -135,7 +133,10 @@ with st.form(key='input_form'):
 if submitted:
     with st.spinner('Predicting...'):
         time.sleep(1)
+
         test_data = pd.DataFrame(params, index=[0])
+        st.dataframe(test_data)
         predict(test_data)
+
         st.success('Done')
 
