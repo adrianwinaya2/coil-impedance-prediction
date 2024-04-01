@@ -21,7 +21,7 @@ st.title('Prediction History')
 
 # ! STREAMLIT GSPREAD
 conn = st.experimental_connection("gsheets", type=GSheetsConnection)
-data = conn.read(ttl=0, usecols=[range(0, 12)])
+data = conn.read(ttl=0, usecols=[i for i in range(0, 12)])
 
 st.write(data)
 
