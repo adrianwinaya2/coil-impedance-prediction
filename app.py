@@ -27,26 +27,27 @@ st.markdown(
 
 
 def create_table():
-    with st.connection('history_db', type='sql').session as s:
-        s.execute('''
-            CREATE TABLE IF NOT EXISTS history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                predict_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-                pid_lv INTEGER,
-                lid_lv INTEGER,
-                tid_lv INTEGER,
-                pod_lv INTEGER,
-                lod_lv INTEGER,
-                tod_lv INTEGER,
-                pid_hv INTEGER,
-                lid_hv INTEGER,
-                tid_hv INTEGER,
-                pod_hv INTEGER,
-                lod_hv INTEGER,
-                tod_hv INTEGER,
-                impedance REAL
-            )
-        ''')
-        s.commit()
+    return
+    # with st.connection('history_db', type='sql').session as s:
+    #     s.execute('''
+    #         CREATE TABLE IF NOT EXISTS history (
+    #             id INTEGER PRIMARY KEY AUTOINCREMENT,
+    #             predict_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    #             pid_lv INTEGER,
+    #             lid_lv INTEGER,
+    #             tid_lv INTEGER,
+    #             pod_lv INTEGER,
+    #             lod_lv INTEGER,
+    #             tod_lv INTEGER,
+    #             pid_hv INTEGER,
+    #             lid_hv INTEGER,
+    #             tid_hv INTEGER,
+    #             pod_hv INTEGER,
+    #             lod_hv INTEGER,
+    #             tod_hv INTEGER,
+    #             impedance REAL
+    #         )
+    #     ''')
+    #     s.commit()
 
 create_table()
