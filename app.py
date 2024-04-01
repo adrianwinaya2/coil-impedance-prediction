@@ -26,8 +26,8 @@ st.markdown(
 )
 
 
-def create_table():
-    return
+# def create_table():
+#     return
     # with st.connection('history_db', type='sql').session as s:
     #     s.execute('''
     #         CREATE TABLE IF NOT EXISTS history (
@@ -50,4 +50,4 @@ def create_table():
     #     ''')
     #     s.commit()
 
-create_table()
+# create_table()

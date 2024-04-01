@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 
+st.set_page_config(
+    page_title="History",
+    page_icon="📚",
+)
+
 st.title('Prediction History')
 
 # ! LOCAL
@@ -20,8 +25,8 @@ st.title('Prediction History')
 # data = pd.DataFrame(sh.sheet1.get_all_records())
 
 # ! STREAMLIT GSPREAD
-conn = st.experimental_connection("gsheets", type=GSheetsConnection)
-data = conn.read(ttl=0, usecols=[i for i in range(0, 12)])
+conn = st.connection("gsheets", type=GSheetsConnection)
+data = conn.read(ttl=0, usecols=[i for i in range(0, 14)]).dropna()
 
 st.write(data)
 
