@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import shap
 import pickle
 import sqlite3
+from streamlit_gsheets import GSheetsConnection
 
 import xgboost as xgb
 
-def insert_data(params, impedance):
-    return
+def insert_data(data):
     # with st.connection('history_db', type='sql').session as s:
     #     s.execute(f'''
     #         INSERT INTO history (
@@ -25,13 +25,23 @@ def insert_data(params, impedance):
     #         )
     #     ''')
     #     s.commit()
+    conn = st.experimental_connection("gsheets", type=GSheetsConnection)
+    df = conn.update(
+        spreadsheet="Coil Impedance Prediction Result",
+        worksheet=0,
+        data=data,
+    )
+    # st.cache_data.clear()
+    # st.experimental_rerun()
 
 def predict(test_data):
     # model = pd.read_pickle('coil_impedance_model.pkl')
     impedance = model.predict(test_data[model.feature_names_in_])[0]
 
     st.write(f'The predicted impedance is {impedance:.2f} ohms')
-    insert_data(test_data, impedance)
+    df = test_data.copy()
+    df['Impedance'] = impedance
+    insert_data(df)
 
     visualize_button = st.button('Visualize')
 
@@ -46,6 +56,8 @@ def visualize(model, test_data):
     def init_shap_js():
         shap.initjs()
     
+    print("masuk visualize")
+    # ! SHAP PREPARATION
     init_shap_js()
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values(test_data)
@@ -54,11 +66,13 @@ def visualize(model, test_data):
     shap_values.index = test_data.index
     explanation = shap.Explanation(shap_values.values, data=test_data, feature_names=test_data.columns)
 
+    # ! SHAP PLOT
     shap_plot(shap_values, test_data, explainer, explanation, index1='PID LV', index2='LID LV', show=False)
     
     return shap_values, explanation
 
 def shap_plot(shap_val, feature_data, explainer=None, explanation=None, show=True):
+    print("masuk shap_plot")
     
     summary, decision, dependence, force, bar, embed, waterfall = st.tabs(['Summary', 'Decision', 'Dependence', 'Force', 'Bar', 'Embedding', 'Waterfall'])
 
