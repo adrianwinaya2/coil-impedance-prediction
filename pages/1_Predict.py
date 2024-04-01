@@ -10,20 +10,21 @@ import sqlite3
 import xgboost as xgb
 
 def insert_data(params, impedance):
-    with st.connection('history_db', type='sql').session as s:
-        s.execute(f'''
-            INSERT INTO history (
-                pid_lv, lid_lv, tid_lv, pod_lv, lod_lv, tod_lv,
-                pid_hv, lid_hv, tid_hv, pod_hv, lod_hv, tod_hv, impedance
-            )
-            VALUES (
-                {params['PID LV'][0]}, {params['LID LV'][0]}, {params['TID LV'][0]}, 
-                {params['POD LV'][0]}, {params['LOD LV'][0]}, {params['TOD LV'][0]},
-                {params['PID HV'][0]}, {params['LID HV'][0]}, {params['TID HV'][0]},
-                {params['POD HV'][0]}, {params['LOD HV'][0]}, {params['TOD HV'][0]}, {impedance}
-            )
-        ''')
-        s.commit()
+    return
+    # with st.connection('history_db', type='sql').session as s:
+    #     s.execute(f'''
+    #         INSERT INTO history (
+    #             pid_lv, lid_lv, tid_lv, pod_lv, lod_lv, tod_lv,
+    #             pid_hv, lid_hv, tid_hv, pod_hv, lod_hv, tod_hv, impedance
+    #         )
+    #         VALUES (
+    #             {params['PID LV'][0]}, {params['LID LV'][0]}, {params['TID LV'][0]}, 
+    #             {params['POD LV'][0]}, {params['LOD LV'][0]}, {params['TOD LV'][0]},
+    #             {params['PID HV'][0]}, {params['LID HV'][0]}, {params['TID HV'][0]},
+    #             {params['POD HV'][0]}, {params['LOD HV'][0]}, {params['TOD HV'][0]}, {impedance}
+    #         )
+    #     ''')
+    #     s.commit()
 
 def predict(test_data):
     # model = pd.read_pickle('coil_impedance_model.pkl')
