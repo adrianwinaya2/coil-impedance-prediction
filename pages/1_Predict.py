@@ -95,7 +95,7 @@ def shap_plot(shap_val, feature_data, explainer=None, explanation=None, show=Tru
         st.write('Visualizing Result.')
         time.sleep(1)
     
-    summary, decision, dependence, force, bar, waterfall = st.tabs(['Summary', 'Decision', 'Dependence', 'Force', 'Bar', 'Waterfall'])
+    summary, decision, force, bar, waterfall = st.tabs(['Summary', 'Decision', 'Force', 'Bar', 'Waterfall'])
 
     with summary:
         st.header('Summary Plot')
@@ -107,14 +107,14 @@ def shap_plot(shap_val, feature_data, explainer=None, explanation=None, show=Tru
         shap.decision_plot(explainer.expected_value, shap_val, features=feature_data)
         st.pyplot(plt.gcf())
     
-    with dependence:
-        st.header('Dependence Plot - Not Compatible')
-        select1, select2 = st.columns(2)
-        feature1 = select1.selectbox('Feature 1', options=feature_data.columns, key='dependence_feature1')
-        feature2 = select2.selectbox('Feature 2', options=feature_data.columns, key='dependence_feature2')
+    # with dependence:
+    #     st.header('Dependence Plot - Not Compatible')
+    #     select1, select2 = st.columns(2)
+    #     feature1 = select1.selectbox('Feature 1', options=feature_data.columns, key='dependence_feature1')
+    #     feature2 = select2.selectbox('Feature 2', options=feature_data.columns, key='dependence_feature2')
 
-        shap.dependence_plot(feature1, interaction_index=feature2, shap_values=shap_val, features=feature_data)
-        st.pyplot(plt.gcf())
+    #     shap.dependence_plot(feature1, interaction_index=feature2, shap_values=shap_val, features=feature_data)
+    #     st.pyplot(plt.gcf())
     
     with force:
         st.header('Force Plot')
