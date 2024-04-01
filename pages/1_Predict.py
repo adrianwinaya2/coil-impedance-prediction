@@ -122,7 +122,7 @@ def shap_plot(shap_val, feature_data, explainer=None, explanation=None, show=Tru
         
 # with open('models/xgb_fs.pkl', 'rb') as file:
 #     model = pickle.load(file)
-model = xgb.Booster(model_file='xgb_fs.xgb')
+model = xgb.Booster(model_file='models/xgb_fs.xgb')
 
 st.title('Coil Impedance Prediction')
 with st.form(key='input_form'):
