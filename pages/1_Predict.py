@@ -163,21 +163,21 @@ st.title('Coil Impedance Prediction')
 with st.form(key='input_form'):
     left, right = st.columns(2)
     params = {
-        'PID LV': int(left.number_input('PID LV', format='%.0f')),
-        'LID LV': int(left.number_input('LID LV', format='%.0f')),
-        'TID LV': int(left.number_input('TID LV', format='%.0f')),
+        'PID LV': int(left.number_input('PID LV', format='%.0f', min_value=0)),
+        'LID LV': int(left.number_input('LID LV', format='%.0f', min_value=0)),
+        'TID LV': int(left.number_input('TID LV', format='%.0f', min_value=0)),
 
-        'POD LV': int(left.number_input('POD LV', format='%.0f')),
-        'LOD LV': int(left.number_input('LOD LV', format='%.0f')),
-        'TOD LV': int(left.number_input('TOD LV', format='%.0f')),
+        'POD LV': int(left.number_input('POD LV', format='%.0f', min_value=0)),
+        'LOD LV': int(left.number_input('LOD LV', format='%.0f', min_value=0)),
+        'TOD LV': int(left.number_input('TOD LV', format='%.0f', min_value=0)),
 
-        'PID HV': int(right.number_input('PID HV', format='%.0f')),
-        'LID HV': int(right.number_input('LID HV', format='%.0f')),
-        'TID HV': int(right.number_input('TID HV', format='%.0f')),
+        'PID HV': int(right.number_input('PID HV', format='%.0f', min_value=0)),
+        'LID HV': int(right.number_input('LID HV', format='%.0f', min_value=0)),
+        'TID HV': int(right.number_input('TID HV', format='%.0f', min_value=0)),
 
-        'POD HV': int(right.number_input('POD HV', format='%.0f')),
-        'LOD HV': int(right.number_input('LOD HV', format='%.0f')),
-        'TOD HV': int(right.number_input('TOD HV', format='%.0f')),
+        'POD HV': int(right.number_input('POD HV', format='%.0f', min_value=0)),
+        'LOD HV': int(right.number_input('LOD HV', format='%.0f', min_value=0)),
+        'TOD HV': int(right.number_input('TOD HV', format='%.0f', min_value=0)),
     }
 
     submitted = st.form_submit_button(label='Predict Impedance')
