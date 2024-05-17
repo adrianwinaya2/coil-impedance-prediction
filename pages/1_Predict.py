@@ -180,7 +180,26 @@ with st.form(key='input_form'):
         'TOD HV': int(right.number_input('TOD HV', format='%.0f', min_value=0)),
     }
 
-    submitted = st.form_submit_button(label='Predict Impedance')
+    if params['PID LV'] >= params['POD LV']:
+        st.error("'PID LV' must be smaller than 'POD LV'")
+        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
+    elif params['PID HV'] >= params['POD HV']:
+        st.error("'PID HV' must be smaller than 'POD HV'")
+        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
+    elif params['LID LV'] >= params['LOD LV']:
+        st.error("'LID LV' must be smaller than 'LOD LV'")
+        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
+    elif params['LID HV'] >= params['LOD HV']:
+        st.error("'LID HV' must be smaller than 'LOD HV'")
+        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
+    elif params['TID LV'] >= params['TOD LV']:
+        st.error("'TID LV' must be smaller than 'TOD LV'")
+        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
+    elif params['TID HV'] >= params['TOD HV']:
+        st.error("'TID HV' must be smaller than 'TOD HV'")
+        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
+    else:
+        submitted = st.form_submit_button(label='Predict Impedance')
 
 if submitted:
     status = st.status('Processing...', expanded=True)
