@@ -160,53 +160,67 @@ with open('models/xgb_fs.pkl', 'rb') as file:
 # model = xgb.Booster(model_file='models/xgb_fs.xgb')
 
 st.title('Coil Impedance Prediction')
+if 'error_msg' not in st.session_state:
+    st.session_state['error_msg'] = "Please fill required inputs"
+
+# Validation function
+def validate_inputs():
+    if st.session_state['PID LV'] >= st.session_state['POD LV']:
+        st.session_state['error_msg'] = "'PID LV' must be smaller than 'POD LV'"
+    elif st.session_state['PID HV'] >= st.session_state['POD LV']:
+        st.session_state['error_msg'] = "'PID HV' must be smaller than 'POD HV'"
+    elif st.session_state['LID LV'] >= st.session_state['LOD LV']:
+        st.session_state['error_msg'] = "'LID LV' must be smaller than 'LOD LV'"
+    elif st.session_state['LID HV'] >= st.session_state['LOD HV']:
+        st.session_state['error_msg'] = "'LID HV' must be smaller than 'LOD HV'"
+    elif st.session_state['TID LV'] >= st.session_state['TOD LV']:
+        st.session_state['error_msg'] = "'TID LV' must be smaller than 'TOD LV'"
+    elif st.session_state['TID HV'] >= st.session_state['TOD HV']:
+        st.session_state['error_msg'] = "'TID HV' must be smaller than 'TOD HV'"
+    else:
+        st.session_state['error_msg'] = ""
+
+# Create the input form
+left, right = st.columns(2)
 with st.form(key='input_form'):
-    left, right = st.columns(2)
-    params = {
-        'PID LV': int(left.number_input('PID LV', min_value=0)),
-        'LID LV': int(left.number_input('LID LV', min_value=0)),
-        'TID LV': int(left.number_input('TID LV', min_value=0)),
+    left.number_input('PID LV', min_value=0, on_change=validate_inputs, key='PID LV')
+    left.number_input('LID LV', min_value=0, on_change=validate_inputs, key='LID LV')
+    left.number_input('TID LV', min_value=0, on_change=validate_inputs, key='TID LV')
 
-        'POD LV': int(left.number_input('POD LV', min_value=0)),
-        'LOD LV': int(left.number_input('LOD LV', min_value=0)),
-        'TOD LV': int(left.number_input('TOD LV', min_value=0)),
+    left.number_input('POD LV', min_value=0, on_change=validate_inputs, key='POD LV')
+    left.number_input('LOD LV', min_value=0, on_change=validate_inputs, key='LOD LV')
+    left.number_input('TOD LV', min_value=0, on_change=validate_inputs, key='TOD LV')
 
-        'PID HV': int(right.number_input('PID HV', min_value=0)),
-        'LID HV': int(right.number_input('LID HV', min_value=0)),
-        'TID HV': int(right.number_input('TID HV', min_value=0)),
+    right.number_input('PID HV', min_value=0, on_change=validate_inputs, key='PID HV')
+    right.number_input('LID HV', min_value=0, on_change=validate_inputs, key='LID HV')
+    right.number_input('TID HV', min_value=0, on_change=validate_inputs, key='TID HV')
 
-        'POD HV': int(right.number_input('POD HV', min_value=0)),
-        'LOD HV': int(right.number_input('LOD HV', min_value=0)),
-        'TOD HV': int(right.number_input('TOD HV', min_value=0)),
-    }
-    
-    if params['PID LV'] >= params['POD LV']:
-        st.error("'PID LV' must be smaller than 'POD LV'")
-        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
-    elif params['PID HV'] >= params['POD HV']:
-        st.error("'PID HV' must be smaller than 'POD HV'")
-        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
-    elif params['LID LV'] >= params['LOD LV']:
-        st.error("'LID LV' must be smaller than 'LOD LV'")
-        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
-    elif params['LID HV'] >= params['LOD HV']:
-        st.error("'LID HV' must be smaller than 'LOD HV'")
-        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
-    elif params['TID LV'] >= params['TOD LV']:
-        st.error("'TID LV' must be smaller than 'TOD LV'")
-        submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
-    elif params['TID HV'] >= params['TOD HV']:
-        st.error("'TID HV' must be smaller than 'TOD HV'")
+    right.number_input('POD HV', min_value=0, on_change=validate_inputs, key='POD HV')
+    right.number_input('LOD HV', min_value=0, on_change=validate_inputs, key='LOD HV')
+    right.number_input('TOD HV', min_value=0, on_change=validate_inputs, key='TOD HV')
+
+    # Initial placeholder for the submit button
+    if st.session_state['error_msg']:
         submitted = st.form_submit_button(label='Predict Impedance', disabled=True)
     else:
-        st.empty()
         submitted = st.form_submit_button(label='Predict Impedance')
 
-if submitted:
+# Display error message if validation fails
+if st.session_state['error_msg']:
+    st.error(st.session_state['error_msg'])
+
+# Successful form submission
+if submitted and not st.session_state['error_msg']:
+    st.success("Form submitted successfully!")
     status = st.status('Processing...', expanded=True)
 
     # ! INPUT DATA
-    input_data = pd.DataFrame(params, index=[0])
+    input_data = pd.DataFrame({
+        'PID LV': st.session_state['PID LV'], 'LID LV': st.session_state['LID LV'], 'TID LV': st.session_state['TID LV'],
+        'POD LV': st.session_state['POD LV'], 'LOD LV': st.session_state['LOD LV'], 'TOD LV': st.session_state['TOD LV'],
+        'PID HV': st.session_state['PID HV'], 'LID HV': st.session_state['LID HV'], 'TID HV': st.session_state['TID HV'],
+        'POD HV': st.session_state['POD HV'], 'LOD HV': st.session_state['LOD HV'], 'TOD HV': st.session_state['TOD HV'],
+    }, index=[0])
     test_data = input_data[model.feature_names_in_]
     st.subheader('Input Data')
     st.dataframe(test_data)
